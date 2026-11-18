@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Maracatu alfaia practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  /* ---------- Colour tokens (light default, dark via OS or data-theme) ---------- */
+  :root {
+    color-scheme: light;
+    --bg: #f3f5f8; --surface: #ffffff; --surface-2: #eceff4; --beat-bg: #e2e7ee;
+    --border: #d3dae3; --text: #16202c; --muted: #5a6777;
+    --accent: #e3a01c; --accent-text: #8a5a00; --accent-ink: #1d1300; --accent-soft: rgba(227,160,28,.18);
+    --right: #e3a01c; --right-text: #8a5a00; --right-soft: rgba(227,160,28,.22);
+    --left: #2f6fd1; --left-text: #1f55a8; --left-soft: rgba(47,111,209,.20);
+    --rumble: #cf3b5a; --rumble-soft: rgba(207,59,90,.12);
+    --play: #1f9e6b; --play-ink: #ffffff; --stop: #cf3b5a; --stop-ink: #ffffff;
+    --playhead: rgba(227,160,28,.30); --danger: #cf3b5a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #0e131a; --surface: #161d27; --surface-2: #1d2632; --beat-bg: #243040;
+      --border: #2c3846; --text: #e7ecf2; --muted: #8c9aab;
+      --accent: #f2b233; --accent-text: #f5c45e; --accent-ink: #1d1300; --accent-soft: rgba(242,178,51,.16);
+      --right: #f2b233; --right-text: #f5c45e; --right-soft: rgba(242,178,51,.22);
+      --left: #5e9bff; --left-text: #8ab6ff; --left-soft: rgba(94,155,255,.22);
+      --rumble: #f0607a; --rumble-soft: rgba(240,96,122,.18);
+      --play: #34c98a; --play-ink: #06170f; --stop: #f0607a; --stop-ink: #1a0509;
+      --playhead: rgba(242,178,51,.24); --danger: #f0607a;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0e131a; --surface: #161d27; --surface-2: #1d2632; --beat-bg: #243040;
+    --border: #2c3846; --text: #e7ecf2; --muted: #8c9aab;
+    --accent: #f2b233; --accent-text: #f5c45e; --accent-ink: #1d1300; --accent-soft: rgba(242,178,51,.16);
+    --right: #f2b233; --right-text: #f5c45e; --right-soft: rgba(242,178,51,.22);
+    --left: #5e9bff; --left-text: #8ab6ff; --left-soft: rgba(94,155,255,.22);
+    --rumble: #f0607a; --rumble-soft: rgba(240,96,122,.18);
+    --play: #34c98a; --play-ink: #06170f; --stop: #f0607a; --stop-ink: #1a0509;
+    --playhead: rgba(242,178,51,.24); --danger: #f0607a;
+  }
+
+  /* ---------- Base & safe areas ---------- */
+  :root { box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 72px); }
+  *, *::before, *::after { box-sizing: inherit; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.45 Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+  .mono { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---------- Sticky transport ---------- */
+  .topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--border); }
+  .topbar-inner { max-width: 980px; margin: 0 auto; padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
+  .play { flex: none; display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border: 0; border-radius: 12px; background: var(--play); color: var(--play-ink); font-weight: 800; cursor: pointer; }
+  .play.on { background: var(--stop); color: var(--stop-ink); }
+  .play svg { width: 16px; height: 16px; fill: currentColor; }
+  .now-title { flex: 1; min-width: 0; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .now-title small { display: block; font-weight: 500; color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bpm { flex: none; display: flex; align-items: center; gap: 4px; }
+  .bpm input { width: 54px; text-align: center; padding: 6px 4px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2); font-weight: 700; }
+  .bpm .lbl { font-size: 12px; color: var(--muted); }
+
+  /* ---------- Layout ---------- */
+  .wrap { max-width: 980px; margin: 0 auto; padding: 14px 14px 48px; display: grid; gap: 14px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px; }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .grow { flex: 1 1 180px; min-width: 0; }
+  .btn { padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-2); font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .btn:hover:not(:disabled) { border-color: var(--muted); }
+  .btn:disabled { opacity: .4; cursor: default; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .btn.danger { color: var(--danger); }
+  .btn.armed { background: var(--danger); border-color: var(--danger); color: #fff; }
+  .toggle { display: inline-flex; align-items: center; gap: 7px; }
+  .toggle::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--muted); }
+  .toggle[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+  .toggle[aria-pressed="true"]::before { background: var(--accent); }
+  select, .text-input { padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-2); font-size: 14px; min-width: 0; }
+  select { font-weight: 600; max-width: 100%; }
+  .slider { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+  .slider input[type="range"] { accent-color: var(--accent); width: 130px; }
+  .count-in { display: none; margin-top: 8px; padding: 6px 10px; border-radius: 10px; background: var(--accent-soft); color: var(--accent-text); font-weight: 700; font-size: 13px; }
+  .count-in.show { display: block; }
+  .note { margin: 10px 0 0; font-size: 13px; color: var(--muted); }
+  .note.warn { color: var(--danger); }
+
+  /* ---------- Stroke palette ---------- */
+  .palette { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; }
+  .pal { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); font-size: 12px; font-weight: 600; cursor: pointer; }
+  .pal[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+  .pal .sw { width: 18px; height: 18px; display: grid; place-items: center; }
+
+  /* ---------- Groove grid ---------- */
+  .sheet-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px; }
+  .sheet-head h2 { margin: 0; font-size: 20px; letter-spacing: -.01em; }
+  .sheet-head p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+  .bars { display: grid; gap: 12px; }
+  .bar { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 10px 10px 8px; }
+  .bar.playing { border-color: var(--accent); }
+  .bar-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+  .bar-num { font-weight: 700; color: var(--accent-text); font-size: 13px; }
+  .bar-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+  .bar-actions .btn { padding: 4px 9px; font-size: 12px; }
+  .bar-actions .arrow { min-width: 34px; font-size: 14px; line-height: 1; }
+  .bar-note { width: 100%; margin: 0 0 8px; padding: 6px 8px; border: 1px dashed transparent; border-radius: 8px; background: transparent; font-size: 13px; font-style: italic; color: var(--text); }
+  .bar-note::placeholder { color: var(--muted); opacity: .7; }
+  .bar-note:hover, .bar-note:focus { border-color: var(--border); background: var(--surface-2); font-style: normal; }
+  .bar-note:not(:placeholder-shown) { background: var(--accent-soft); }
+  .steps { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 10px 4px; }
+  @media (min-width: 760px) { .steps { grid-template-columns: repeat(16, minmax(0, 1fr)); } }
+  .step { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .step.sep { border-left: 2px solid var(--border); padding-left: 4px; }
+  @media (min-width: 760px) { .step.sep-wide { border-left: 2px solid var(--border); padding-left: 4px; } }
+  .sub { font-size: 11px; color: var(--muted); }
+  .step.beat .sub { color: var(--accent-text); font-weight: 700; }
+  .cell { width: 100%; max-width: 46px; aspect-ratio: 1; padding: 0; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-2); display: grid; place-items: center; cursor: pointer; }
+  .step.beat .cell { background: var(--beat-bg); }
+  .cell.now { outline: 2px solid var(--accent); outline-offset: 0; background: var(--playhead); }
+
+  /* Stroke glyphs: colour = hand, size = dynamic */
+  .ball { position: relative; display: block; aspect-ratio: 1; border-radius: 50%; }
+  .ball.head { width: 58%; }
+  .ball.ghost { width: 26%; }
+  .ball.right { background: var(--right); }
+  .ball.left { background: var(--left); }
+  .ball.head.right { box-shadow: 0 0 0 3px var(--right-soft); }
+  .ball.head.left { box-shadow: 0 0 0 3px var(--left-soft); }
+  .ball.both { background: linear-gradient(90deg, var(--right) 50%, var(--left) 50%); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .ball.flam::before { content: ""; position: absolute; width: 38%; aspect-ratio: 1; border-radius: 50%; background: var(--left); left: -30%; top: -18%; border: 2px solid var(--surface-2); }
+  .rumble { width: 62%; aspect-ratio: 1; border-radius: 50%; border: 2px dashed var(--rumble); background: var(--rumble-soft); color: var(--rumble); font-weight: 700; font-size: 12px; display: grid; place-items: center; line-height: 1; }
+  .pal .ball.head { width: 16px; } .pal .ball.ghost { width: 8px; } .pal .rumble { width: 16px; font-size: 9px; border-width: 1.5px; }
+  .pal .ball.flam::before { width: 7px; border-width: 1px; }
+
+  .hand { width: 100%; max-width: 46px; height: 24px; padding: 0; border: 0; border-radius: 6px; background: none; font-weight: 700; font-size: 12px; cursor: pointer; color: var(--muted); }
+  .hand:hover { background: var(--surface-2); }
+  .hand.r { color: var(--right-text); }
+  .hand.l { color: var(--left-text); }
+  .hand.x { color: var(--rumble); }
+  @keyframes pop { from { transform: scale(1.3); } to { transform: scale(1); } }
+  .pop { animation: pop .14s ease-out; }
+  @media (prefers-reduced-motion: reduce) { .pop { animation: none; } }
+
+  /* ---------- Text / backup panel ---------- */
+  .seg { display: inline-flex; padding: 3px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border); }
+  .seg button { border: 0; background: none; padding: 6px 10px; border-radius: 7px; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  textarea { width: 100%; min-height: 220px; resize: vertical; padding: 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); font-size: 13px; line-height: 1.55; white-space: pre; overflow-x: auto; }
+  .errors { color: var(--danger); font-size: 13px; margin: 0; padding-left: 18px; }
+  details summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+  .help { font-size: 13px; color: var(--muted); }
+  .help code, .help pre { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; color: var(--text); }
+  .help pre { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px; overflow-x: auto; }
+  .help table { border-collapse: collapse; }
+  .help td { padding: 2px 12px 2px 0; vertical-align: top; }
+  .status { font-size: 12px; color: var(--muted); text-align: center; }
+  .panel-title { margin: 0 0 8px; font-size: 16px; }
+  .hidden { display: none !important; }
+
+  .toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 8px); z-index: 20; padding: 9px 14px; border-radius: 10px; background: var(--accent); color: var(--accent-ink); font-size: 13px; font-weight: 700; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; max-width: 90vw; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <button id="playBtn" class="play" type="button" aria-label="Play">
+      <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      <svg id="stopIcon" viewBox="0 0 24 24" class="hidden"><path d="M6 6h12v12H6z"/></svg>
+      <span id="playLabel">Play</span>
+    </button>
+    <div class="now-title"><span id="nowTitle">Loading…</span><small id="nowMeta"></small></div>
+    <div class="bpm">
+      <input id="bpmInput" class="mono" type="number" inputmode="numeric" min="40" max="200" aria-label="Tempo in BPM">
+      <span class="lbl">bpm</span>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <!-- Practice controls -->
+  <section class="card">
+    <div class="row">
+      <div class="slider"><span>Tempo</span><input id="bpmSlider" type="range" min="40" max="200" aria-label="Tempo"></div>
+      <button id="tapBtn" class="btn" type="button">Tap tempo</button>
+      <div class="slider" title="Delays the e and a sixteenths. 33% is a full triplet feel."><span>Swing</span><input id="swingSlider" type="range" min="0" max="33" step="1" aria-label="Swing"><span id="swingVal" class="mono">0%</span></div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button id="pulseBtn" class="btn toggle" type="button" aria-pressed="true">Gonguê pulse</button>
+      <button id="countInBtn" class="btn toggle" type="button" aria-pressed="false">Count-in bar</button>
+      <button id="followBtn" class="btn toggle" type="button" aria-pressed="true">Follow playhead</button>
+    </div>
+    <div id="countInBanner" class="count-in mono">Count-in: 1</div>
+  </section>
+
+  <!-- Groove library -->
+  <section class="card">
+    <div class="row">
+      <select id="grooveSelect" class="grow" aria-label="Groove"></select>
+      <input id="titleInput" class="text-input grow" type="text" placeholder="Groove name" aria-label="Groove name">
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button id="newBtn" class="btn" type="button">New groove</button>
+      <button id="dupGrooveBtn" class="btn" type="button">Duplicate groove</button>
+      <button id="delGrooveBtn" class="btn danger" type="button">Delete groove</button>
+      <button id="undoBtn" class="btn" type="button" disabled>Undo</button>
+    </div>
+    <p id="grooveHint" class="note hidden"></p>
+    <p id="modeNote" class="note hidden"></p>
+  </section>
+
+  <!-- Grid -->
+  <section>
+    <div class="sheet-head">
+      <div>
+        <h2 id="sheetTitle">Loading…</h2>
+        <p id="sheetMeta"></p>
+      </div>
+      <div class="row">
+        <button id="addBarBtn" class="btn" type="button">Add bar</button>
+        <button id="clearBtn" class="btn danger" type="button">Clear notes</button>
+      </div>
+    </div>
+    <!-- Tap mode: Cycle steps through every stroke; a stroke "paints" it directly -->
+    <div id="palette" class="palette" role="group" aria-label="Tap mode"></div>
+    <div id="bars" class="bars"></div>
+  </section>
+
+  <!-- Text notation, import & export -->
+  <section class="card">
+    <h3 class="panel-title">Edit as text, import and export</h3>
+    <div class="row" style="margin-bottom:8px">
+      <div class="seg" role="group" aria-label="Text scope">
+        <button id="scopeOneBtn" type="button" aria-pressed="true">This groove</button>
+        <button id="scopeAllBtn" type="button" aria-pressed="false">All grooves</button>
+      </div>
+      <button id="refreshTextBtn" class="btn" type="button" title="Discard text edits and reload from the app">Reload text</button>
+    </div>
+    <textarea id="textArea" class="mono" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Groove notation"></textarea>
+    <ul id="textErrors" class="errors hidden"></ul>
+    <div class="row" style="margin-top:8px">
+      <button id="applyTextBtn" class="btn primary" type="button">Apply text</button>
+      <button id="copyTextBtn" class="btn" type="button">Copy text</button>
+      <button id="shareTextBtn" class="btn hidden" type="button">Share…</button>
+      <span class="grow"></span>
+      <button id="exportBtn" class="btn" type="button">Export file</button>
+      <label class="btn" style="display:inline-block">Import file<input id="importInput" type="file" accept=".json,.txt,application/json,text/plain" class="hidden"></label>
+    </div>
+    <details style="margin-top:12px">
+      <summary>Notation guide</summary>
+      <div class="help">
+        <p>One line per bar, 16 sixteenths, one character each. Spaces are ignored, so group them by beat. A line starting with <code>#</code> starts a new groove and gives its name.</p>
+        <pre># Example groove
+R..L R.r. .L.l R.R.  > main groove
+R..L R.r. .L.l R.R.  x3
+~~~~ ~~~~ B... F...  > roll into the break</pre>
+        <table>
+          <tr><td><code>R</code> <code>L</code></td><td>right or left hand, full stroke</td></tr>
+          <tr><td><code>r</code> <code>l</code></td><td>right or left hand, ghost note</td></tr>
+          <tr><td><code>~</code></td><td>rumble (roll)</td></tr>
+          <tr><td><code>B</code></td><td>both hands together</td></tr>
+          <tr><td><code>F</code></td><td>flam: soft left grace note just before a right stroke</td></tr>
+          <tr><td><code>.</code></td><td>rest</td></tr>
+        </table>
+        <p><code>x2</code>, <code>x3</code>… after the bar repeats it. A note for the bar goes at the end after <code>&gt;</code>. On a repeated bar the note shows on the first repeat only.</p>
+        <p><strong>Apply text</strong> in “This groove” replaces the current groove. In “All grooves”, grooves are matched by name: the same name updates it, a new name adds a groove. Apply never deletes. Lines starting with <code>//</code> are comments.</p>
+      </div>
+    </details>
+    <div class="row" style="margin-top:12px">
+      <button id="restoreBtn" class="btn danger" type="button">Delete all grooves</button>
+    </div>
+  </section>
+
+  <p id="syncStatus" class="status"></p>
+</main>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+
+// ======================================================================
+// <notation> — pure functions, no DOM.
+// A cell is one stroke: '' rest, R/L full stroke, r/l ghost, ~ rumble, B both, F flam.
+// ======================================================================
+const CELL_CYCLE = ['', 'R', 'r', 'L', 'l', '~', 'B', 'F'];
+const CELL_TO_CH = { '': '.', R: 'R', r: 'r', L: 'L', l: 'l', '~': '~', B: 'B', F: 'F' };
+const CH_TO_CELL = { '.': '', '-': '', '_': '', R: 'R', r: 'r', L: 'L', l: 'l', '~': '~', B: 'B', b: 'B', F: 'F', f: 'F' };
+const MAX_BARS = 32, BPM_MIN = 40, BPM_MAX = 200, DEFAULT_BPM = 100, MAX_NOTE = 200;
+
+const emptyBar = () => ({ cells: new Array(16).fill(''), note: '' });
+const clampBpm = (v, fallback = DEFAULT_BPM) => {
+  const n = Math.round(Number(v));
+  return Number.isFinite(n) ? Math.min(BPM_MAX, Math.max(BPM_MIN, n)) : fallback;
+};
+const slug = (s) => String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'groove';
+const groupBy4 = (s) => s.match(/.{1,4}/g).join(' ');
+const cellsToStr = (cells) => groupBy4(cells.map((c) => CELL_TO_CH[c] ?? '.').join(''));
+const cleanNote = (s) => String(s || '').replace(/\s+/g, ' ').trim().slice(0, MAX_NOTE);
+
+// Parses one bar line: "R..L R.r. .L.l R.R.  x2  > note". Returns {bar, reps}; throws readable Errors.
+function parseBarLine(line) {
+  let body = line, note = '', reps = 1;
+  const gt = body.indexOf('>');
+  if (gt >= 0) { note = cleanNote(body.slice(gt + 1)); body = body.slice(0, gt); }
+  const rep = body.match(/\s[x×*]\s*(\d+)\s*$/i);
+  if (rep) { reps = Number(rep[1]); body = body.slice(0, rep.index); }
+  if (reps < 1 || reps > MAX_BARS) throw new Error(`repeat must be between 1 and ${MAX_BARS}`);
+  if (body.includes('|')) throw new Error('no “|” needed: hands are part of each stroke here');
+  const chars = [...body.replace(/\s+/g, '')];
+  if (chars.length !== 16) throw new Error(`${chars.length} steps, needs 16`);
+  const cells = chars.map((ch) => {
+    if (!(ch in CH_TO_CELL)) throw new Error(`unknown stroke “${ch}” (use R r L l ~ B F .)`);
+    return CH_TO_CELL[ch];
+  });
+  return { bar: { cells, note }, reps };
+}
+
+// Expands a parsed line into bars: the note goes on the first repeat only.
+function expand({ bar, reps }) {
+  return Array.from({ length: reps }, (_, k) => ({ cells: [...bar.cells], note: k === 0 ? bar.note : '' }));
+}
+
+function grooveToText(g) {
+  const lines = [`# ${g.title}`];
+  // Collapse a bar with following identical bars that have no note of their own
+  for (let i = 0; i < g.bars.length;) {
+    const key = g.bars[i].cells.join(',');
+    let j = i + 1;
+    while (j < g.bars.length && g.bars[j].cells.join(',') === key && !g.bars[j].note) j++;
+    let line = cellsToStr(g.bars[i].cells);
+    if (j - i > 1) line += `  x${j - i}`;
+    if (g.bars[i].note) line += `  > ${g.bars[i].note}`;
+    lines.push(line);
+    i = j;
+  }
+  return lines.join('\n');
+}
+
+// Returns {grooves:[{title,bars,errors}], errors:[string]}; each groove carries its own errors.
+function parseNotation(text) {
+  const grooves = [], errors = [];
+  let cur = null;
+  const fail = (msg) => { errors.push(msg); if (cur) cur.errors.push(msg); };
+  String(text).split(/\r?\n/).forEach((raw, idx) => {
+    const line = raw.trim();
+    if (!line || line.startsWith('//')) return;   // whole-line comments only, so notes can contain "//"
+    if (line.startsWith('#')) {
+      const title = line.replace(/^#+\s*/, '').replace(/\(?\s*\d{2,3}\s*bpm\s*\)?\s*$/i, '').trim();
+      cur = { title: title || 'Untitled groove', bars: [], errors: [] };
+      grooves.push(cur);
+      return;
+    }
+    if (!cur) { cur = { title: 'Untitled groove', bars: [], errors: [] }; grooves.push(cur); }
+    try { cur.bars.push(...expand(parseBarLine(line))); }
+    catch (e) { fail(`Line ${idx + 1}: ${e.message}`); }
+  });
+  grooves.forEach((g) => {
+    cur = g;
+    if (!g.bars.length) fail(`“${g.title}” has no bars`);
+    if (g.bars.length > MAX_BARS) fail(`“${g.title}” has ${g.bars.length} bars (max ${MAX_BARS})`);
+  });
+  return { grooves, errors };
+}
+// </notation>
+
+// No built-in grooves yet: the shared library lives in grooves.txt.
+const starterLibrary = () => [{ id: 'new-groove', title: 'New groove', bars: [emptyBar()] }];
+
+// ======================================================================
+// State
+// mode 'editor': whole library editable (Claude artifact, or no grooves.txt found)
+// mode 'shared': standard grooves from grooves.txt are read-only; edits go to "My grooves"
+// ======================================================================
+const LS_EDITOR = 'maracatu-alfaia-v1';
+const LS_MINE = 'maracatu-alfaia-mine-v1';
+const FORMAT = 'maracatu-alfaia-v1';
+
+let mode = 'editor';
+let library = [];
+let settings = { activeId: null, bpm: DEFAULT_BPM, pulse: true, countIn: false, follow: true, swing: 0 };
+let updatedAt = 0;
+let textScope = 'one';
+let textDirty = false;
+let brush = 'cycle';        // tap mode: 'cycle', a stroke code, or 'erase'
+let skippedShared = [];
+const undoStack = [];
+
+const $ = (id) => document.getElementById(id);
+const els = {
+  playBtn: $('playBtn'), playIcon: $('playIcon'), stopIcon: $('stopIcon'), playLabel: $('playLabel'),
+  nowTitle: $('nowTitle'), nowMeta: $('nowMeta'), bpmInput: $('bpmInput'), bpmSlider: $('bpmSlider'),
+  tapBtn: $('tapBtn'), swingSlider: $('swingSlider'), swingVal: $('swingVal'),
+  pulseBtn: $('pulseBtn'), countInBtn: $('countInBtn'), followBtn: $('followBtn'), countInBanner: $('countInBanner'),
+  grooveSelect: $('grooveSelect'), titleInput: $('titleInput'), newBtn: $('newBtn'), dupGrooveBtn: $('dupGrooveBtn'),
+  delGrooveBtn: $('delGrooveBtn'), undoBtn: $('undoBtn'), grooveHint: $('grooveHint'), modeNote: $('modeNote'),
+  sheetTitle: $('sheetTitle'), sheetMeta: $('sheetMeta'), addBarBtn: $('addBarBtn'), clearBtn: $('clearBtn'),
+  palette: $('palette'), bars: $('bars'),
+  scopeOneBtn: $('scopeOneBtn'), scopeAllBtn: $('scopeAllBtn'), refreshTextBtn: $('refreshTextBtn'),
+  textArea: $('textArea'), textErrors: $('textErrors'), applyTextBtn: $('applyTextBtn'), copyTextBtn: $('copyTextBtn'),
+  shareTextBtn: $('shareTextBtn'), exportBtn: $('exportBtn'), importInput: $('importInput'), restoreBtn: $('restoreBtn'),
+  syncStatus: $('syncStatus'), toast: $('toast'),
+};
+
+const active = () => library.find((g) => g.id === settings.activeId) || library[0];
+const own = () => library.filter((g) => !g.readonly);
+const sameBars = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+function uniqueId(base) {
+  let id = base;
+  while (library.some((x) => x.id === id)) id = `${base}-${Math.random().toString(36).slice(2, 5)}`;
+  return id;
+}
+
+// A standard groove is never changed: the first edit makes a personal copy and switches to it.
+function ensureEditable() {
+  const g = active();
+  if (!g.readonly) return g;
+  let title = `${g.title} (my version)`;
+  for (let n = 2; own().some((x) => x.title === title); n++) title = `${g.title} (my version ${n})`;
+  const copy = { id: uniqueId(slug(title)), title, bars: structuredClone(g.bars) };
+  library.push(copy);
+  settings.activeId = copy.id;
+  textDirty = false;
+  toast(`Saved as “${title}” in My grooves`);
+  return copy;
+}
+
+function mutate(fn, { render = true } = {}) {
+  pushUndo();
+  fn(ensureEditable());
+  touch();
+  if (render) renderAll();
+}
+function pushUndo() {
+  undoStack.push(JSON.stringify({ library, activeId: settings.activeId }));
+  if (undoStack.length > 80) undoStack.shift();
+  els.undoBtn.disabled = false;
+}
+function undo() {
+  const s = undoStack.pop();
+  if (!s) return;
+  const o = JSON.parse(s);
+  library = o.library;
+  settings.activeId = o.activeId;
+  els.undoBtn.disabled = undoStack.length === 0;
+  textDirty = false;
+  touch();
+  renderAll();
+  toast('Undone');
+}
+
+// ======================================================================
+// Persistence
+// ======================================================================
+const barToLine = (b) => cellsToStr(b.cells) + (b.note ? `  > ${b.note}` : '');
+
+function snapshot() {
+  return {
+    format: FORMAT,
+    updatedAt,
+    activeId: settings.activeId,
+    settings: { bpm: settings.bpm, pulse: settings.pulse, countIn: settings.countIn, follow: settings.follow, swing: settings.swing },
+    library: own().map((g) => ({ id: g.id, title: g.title, bars: g.bars.map(barToLine) })),
+  };
+}
+
+function linesToBars(lines) {
+  return (Array.isArray(lines) ? lines : []).flatMap((l) => {
+    try { return expand(parseBarLine(String(l))); } catch { return []; }
+  }).slice(0, MAX_BARS);
+}
+
+function parseStored(obj) {
+  if (!obj || obj.format !== FORMAT || !Array.isArray(obj.library)) return null;
+  const lib = obj.library.map((g) => ({
+    id: String(g.id || slug(g.title)),
+    title: String(g.title || 'Untitled groove'),
+    bars: linesToBars(g.bars),
+  })).filter((g) => g.bars.length);
+  const s = obj.settings || {};
+  return {
+    lib,
+    activeId: obj.activeId,
+    settings: {
+      bpm: clampBpm(s.bpm), pulse: s.pulse !== false, countIn: Boolean(s.countIn), follow: s.follow !== false,
+      swing: Math.min(33, Math.max(0, Number(s.swing) || 0)),
+    },
+    updatedAt: Number(obj.updatedAt) || 0,
+  };
+}
+
+function applyStored(st, standard = []) {
+  if (!st) return false;
+  const lib = [...standard, ...st.lib.filter((g) => !standard.some((s) => s.id === g.id))];
+  if (!lib.length) return false;
+  library = lib;
+  settings = { ...st.settings, activeId: lib.some((g) => g.id === st.activeId) ? st.activeId : lib[0].id };
+  updatedAt = st.updatedAt;
+  return true;
+}
+
+const storageKey = () => (mode === 'editor' ? LS_EDITOR : LS_MINE);
+function saveLocal() {
+  try { localStorage.setItem(storageKey(), JSON.stringify(snapshot())); } catch { /* blocked: export still works */ }
+}
+function loadLocal() {
+  try { const raw = localStorage.getItem(storageKey()); return raw ? parseStored(JSON.parse(raw)) : null; } catch { return null; }
+}
+function touch() {
+  updatedAt = Date.now();
+  saveLocal();
+  scheduleCloud();
+}
+
+// Account storage: only inside the claude.ai viewer (your editor).
+const cloud = { ref: null, writing: false, pending: false, timer: null };
+function setSync(msg) { els.syncStatus.textContent = msg; }
+
+async function initCloud() {
+  try {
+    const [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+    if (!db || !user) return;
+    const uid = await user.id();
+    if (!uid) return;
+    cloud.ref = db.doc(`data/users/${uid}/library`);
+    const snap = await cloud.ref.get();
+    let remote = null;
+    if (snap.exists) { try { remote = parseStored(JSON.parse(snap.data().payload)); } catch { remote = null; } }
+    if (remote && remote.lib.length && remote.updatedAt > updatedAt && applyStored(remote)) {
+      saveLocal();
+      textDirty = false;
+      renderAll();
+      setSync('Synced from your account');
+    } else {
+      await pushCloud();
+    }
+  } catch {
+    setSync('Saved on this device only');
+  }
+}
+function scheduleCloud() {
+  if (!cloud.ref) return;
+  clearTimeout(cloud.timer);
+  cloud.timer = setTimeout(pushCloud, 1200);
+}
+async function pushCloud() {
+  if (!cloud.ref) return;
+  if (cloud.writing) { cloud.pending = true; return; }
+  cloud.writing = true;
+  try {
+    await cloud.ref.set({ format: FORMAT, updatedAt, payload: JSON.stringify(snapshot()) });
+    setSync('Saved to your account and this device');
+  } catch {
+    setSync('Account save failed, saved on this device');
+  } finally {
+    cloud.writing = false;
+    if (cloud.pending) { cloud.pending = false; pushCloud(); }
+  }
+}
+
+// grooves.txt next to the page (GitHub Pages). Returns standard grooves, or null for editor mode.
+async function loadSharedFile() {
+  if (!/^https?:$/.test(location.protocol)) return null;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 5000);
+  try {
+    const res = await fetch('grooves.txt', { cache: 'no-cache', signal: ctrl.signal });
+    if (!res.ok) return null;
+    const { grooves } = parseNotation(await res.text());
+    const good = grooves.filter((g) => !g.errors.length);
+    skippedShared = grooves.filter((g) => g.errors.length).map((g) => ({ title: g.title, error: g.errors[0] }));
+    if (!good.length) return null;
+    const ids = new Set();
+    return good.map((g) => {
+      let id = `std-${slug(g.title)}`;
+      while (ids.has(id)) id += '-2';
+      ids.add(id);
+      return { id, title: g.title, bars: g.bars, readonly: true };
+    });
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// ======================================================================
+// Import / merge
+// ======================================================================
+function groovesFromFileText(text) {
+  let data = null;
+  try { data = JSON.parse(text); } catch { /* not JSON: try notation */ }
+  if (data && typeof data === 'object') {
+    if (data.format === FORMAT && Array.isArray(data.library)) {
+      return data.library.map((g) => ({ id: g.id, title: String(g.title || 'Imported groove'), bars: linesToBars(g.bars) }));
+    }
+    throw new Error('Not an alfaia export file');
+  }
+  const { grooves, errors } = parseNotation(text);
+  if (errors.length) throw new Error(errors[0]);
+  if (!grooves.length) throw new Error('No grooves found');
+  return grooves;
+}
+
+// Merge into own grooves by id, then name. Never deletes. Unchanged standard grooves are skipped.
+function mergeGrooves(incoming) {
+  let added = 0, updated = 0, lastId = null;
+  for (const g of incoming) {
+    if (!g.bars || !g.bars.length) continue;
+    let title = (g.title || '').trim() || 'Untitled groove';
+    const bars = g.bars.slice(0, MAX_BARS);
+    const std = library.find((x) => x.readonly && x.title.toLowerCase() === title.toLowerCase());
+    if (std) {
+      if (sameBars(std.bars, bars)) continue;
+      title = `${std.title} (my version)`;
+    }
+    const hit = (g.id && own().find((x) => x.id === g.id)) || own().find((x) => x.title.toLowerCase() === title.toLowerCase());
+    if (hit) {
+      if (hit.title === title && sameBars(hit.bars, bars)) continue;
+      hit.title = title; hit.bars = bars; updated++; lastId = hit.id;
+    } else {
+      const id = uniqueId(slug(title)); library.push({ id, title, bars }); added++; lastId = id;
+    }
+  }
+  return { added, updated, lastId };
+}
+
+// ======================================================================
+// Audio: synthesised alfaia (low membrane drum) and gonguê bell
+// ======================================================================
+let audioCtx = null, noiseBuffer = null, out = null;
+
+function initAudio() {
+  if (!audioCtx) {
+    // iOS: without this, Web Audio is muted when the ring/silent switch is on silent
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch { /* unsupported */ }
+    const AC = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AC();
+    out = audioCtx.createDynamicsCompressor();   // keeps stacked low hits from clipping
+    out.threshold.value = -8; out.knee.value = 8; out.ratio.value = 6;
+    out.attack.value = 0.003; out.release.value = 0.12;
+    out.connect(audioCtx.destination);
+    const sr = audioCtx.sampleRate;
+    noiseBuffer = audioCtx.createBuffer(1, sr, sr);
+    const ch = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < sr; i++) ch[i] = Math.random() * 2 - 1;
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+function envGain(time, peak, decay, attack = 0.004) {
+  const g = audioCtx.createGain();
+  g.gain.setValueAtTime(0.0001, time);
+  g.gain.linearRampToValueAtTime(Math.max(0.0002, peak), time + attack);
+  g.gain.exponentialRampToValueAtTime(0.0001, time + decay);
+  g.connect(out);
+  return g;
+}
+function noiseBurst(time, filterType, freq, peak, decay) {
+  const src = audioCtx.createBufferSource();
+  src.buffer = noiseBuffer;
+  const f = audioCtx.createBiquadFilter();
+  f.type = filterType; f.frequency.setValueAtTime(freq, time);
+  src.connect(f).connect(envGain(time, peak, decay, 0.002));
+  src.start(time); src.stop(time + decay + 0.02);
+}
+
+// One mallet stroke. level: ~0.3 ghost … 1 full. The left hand is pitched slightly higher and drier.
+function drumHit(time, level, hand) {
+  const left = hand === 'L';
+  const f0 = left ? 88 : 78;                    // fundamental, Hz
+  const decay = 0.14 + 0.5 * level * (left ? 0.85 : 1);
+
+  // Body: pitched membrane with a fast initial pitch drop
+  const body = audioCtx.createOscillator();
+  body.type = 'sine';
+  body.frequency.setValueAtTime(f0 * 1.9, time);
+  body.frequency.exponentialRampToValueAtTime(f0, time + 0.03);
+  body.frequency.exponentialRampToValueAtTime(f0 * 0.85, time + decay);
+  body.connect(envGain(time, 0.9 * level, decay));
+  body.start(time); body.stop(time + decay + 0.02);
+
+  // Overtone: phone and laptop speakers can't reproduce ~80 Hz, this carries the pitch for them
+  const ot = audioCtx.createOscillator();
+  ot.type = 'triangle';
+  ot.frequency.setValueAtTime(f0 * 2.6, time);
+  ot.frequency.exponentialRampToValueAtTime(f0 * 2.1, time + decay * 0.5);
+  ot.connect(envGain(time, 0.3 * level, decay * 0.5));
+  ot.start(time); ot.stop(time + decay * 0.5 + 0.02);
+
+  // Mallet attack and skin thud
+  noiseBurst(time, 'lowpass', 1200 + 2200 * level, 0.32 * level, 0.025);
+  noiseBurst(time, 'lowpass', 260, 0.55 * level, 0.09);
+}
+
+function drumRoll(time, dur) {
+  const n = Math.max(3, Math.round(dur / 0.04));
+  for (let i = 0; i < n; i++) drumHit(time + (i * dur) / n, 0.42 + (i % 2 ? 0 : 0.08), i % 2 ? 'L' : 'R');
+}
+
+function playCell(c, time, dur) {
+  switch (c) {
+    case 'R': drumHit(time, 1, 'R'); break;
+    case 'r': drumHit(time, 0.3, 'R'); break;
+    case 'L': drumHit(time, 0.95, 'L'); break;
+    case 'l': drumHit(time, 0.3, 'L'); break;
+    case '~': drumRoll(time, dur); break;
+    case 'B': drumHit(time, 1.05, 'R'); drumHit(time + 0.004, 0.95, 'L'); break;   // 4 ms spread keeps it thick, not phasey
+    case 'F': drumHit(Math.max(audioCtx.currentTime, time - 0.03), 0.35, 'L'); drumHit(time, 1.05, 'R'); break;
+    default: break;
+  }
+}
+
+function gongue(time, beatOne) {
+  // Metal bell: two inharmonic partials, beat 1 higher
+  const f = beatOne ? 880 : 660;
+  [[1, 0.16, 0.35], [2.76, 0.06, 0.18]].forEach(([mult, peak, decay]) => {
+    const o = audioCtx.createOscillator();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(f * mult, time);
+    o.connect(envGain(time, peak, decay, 0.002));
+    o.start(time); o.stop(time + decay + 0.02);
+  });
+}
+
+function countClick(time, beatOne) {
+  const o = audioCtx.createOscillator();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(beatOne ? 1150 : 840, time);
+  o.connect(envGain(time, 0.3, 0.055, 0.003));
+  o.start(time); o.stop(time + 0.07);
+}
+
+// ======================================================================
+// Scheduler: lookahead on the audio clock; visuals drained by rAF
+// ======================================================================
+let isPlaying = false, currentStep = 0, nextNoteTime = 0, schedTimer = null;
+const visQueue = [];
+const stepDur = () => 60 / settings.bpm / 4;
+
+function scheduleStep(step, time, dur) {
+  if (step < 0) {
+    const c = step + 16;
+    if (c % 4 === 0) { countClick(time, c === 0); visQueue.push({ time, kind: 'count', beat: c / 4 + 1 }); }
+    return;
+  }
+  const barIdx = Math.floor(step / 16), s = step % 16;
+  const bar = active().bars[barIdx];
+  if (!bar) return;
+  playCell(bar.cells[s], time, dur);
+  if (settings.pulse && s % 4 === 0) gongue(time, s === 0);
+  visQueue.push({ time, kind: 'step', bar: barIdx, step: s, hit: Boolean(bar.cells[s]) });
+}
+
+function schedulerLoop() {
+  const dur = stepDur();
+  const total = active().bars.length * 16;
+  while (nextNoteTime < audioCtx.currentTime + 0.1) {
+    if (currentStep >= total) currentStep = 0;
+    const swingOffset = currentStep >= 0 && currentStep % 2 === 1 ? (settings.swing / 100) * dur : 0;
+    scheduleStep(currentStep, nextNoteTime + swingOffset, dur);
+    nextNoteTime += dur;
+    currentStep++;
+  }
+}
+
+let lastCell = null, lastBar = -1;
+function visLoop() {
+  if (!isPlaying) return;
+  const now = audioCtx.currentTime;
+  let ev = null;
+  while (visQueue.length && visQueue[0].time <= now) ev = visQueue.shift();
+  if (ev) showPlayhead(ev);
+  requestAnimationFrame(visLoop);
+}
+
+function showPlayhead(ev) {
+  if (ev.kind === 'count') {
+    els.countInBanner.textContent = `Count-in: ${ev.beat}`;
+    els.countInBanner.classList.add('show');
+    return;
+  }
+  els.countInBanner.classList.remove('show');
+  if (lastCell) lastCell.classList.remove('now');
+  const cell = els.bars.querySelector(`.cell[data-bar="${ev.bar}"][data-step="${ev.step}"]`);
+  if (cell) {
+    cell.classList.add('now');
+    lastCell = cell;
+    if (ev.hit) {
+      const sym = cell.firstElementChild;
+      if (sym) { sym.classList.remove('pop'); void sym.offsetWidth; sym.classList.add('pop'); }
+    }
+  }
+  if (ev.bar !== lastBar) {
+    els.bars.querySelectorAll('.bar.playing').forEach((b) => b.classList.remove('playing'));
+    const barEl = els.bars.querySelector(`.bar[data-bar="${ev.bar}"]`);
+    if (barEl) {
+      barEl.classList.add('playing');
+      if (settings.follow) {
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        barEl.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
+      }
+    }
+    lastBar = ev.bar;
+  }
+}
+
+function startPlayback() {
+  initAudio();
+  isPlaying = true;
+  currentStep = settings.countIn ? -16 : 0;
+  nextNoteTime = audioCtx.currentTime + 0.06;
+  visQueue.length = 0; lastBar = -1;
+  schedulerLoop();
+  schedTimer = setInterval(schedulerLoop, 25);
+  requestAnimationFrame(visLoop);
+  syncTransport();
+}
+function stopPlayback() {
+  isPlaying = false;
+  clearInterval(schedTimer); schedTimer = null;
+  visQueue.length = 0;
+  if (lastCell) lastCell.classList.remove('now');
+  lastCell = null; lastBar = -1;
+  els.bars.querySelectorAll('.bar.playing').forEach((b) => b.classList.remove('playing'));
+  els.countInBanner.classList.remove('show');
+  syncTransport();
+}
+const togglePlay = () => (isPlaying ? stopPlayback() : startPlayback());
+
+// ======================================================================
+// Rendering
+// ======================================================================
+const SUBDIV = ['1', 'e', '&', 'a', '2', 'e', '&', 'a', '3', 'e', '&', 'a', '4', 'e', '&', 'a'];
+const CELL_NAME = { '': 'rest', R: 'right full', r: 'right ghost', L: 'left full', l: 'left ghost', '~': 'rumble', B: 'both hands', F: 'flam' };
+const PALETTE = [
+  ['cycle', 'Cycle'], ['R', 'R full'], ['r', 'R ghost'], ['L', 'L full'], ['l', 'L ghost'],
+  ['~', 'Rumble'], ['B', 'Both'], ['F', 'Flam'], ['erase', 'Erase'],
+];
+const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function glyph(c) {
+  switch (c) {
+    case 'R': return '<span class="ball head right"></span>';
+    case 'r': return '<span class="ball ghost right"></span>';
+    case 'L': return '<span class="ball head left"></span>';
+    case 'l': return '<span class="ball ghost left"></span>';
+    case '~': return '<span class="rumble mono">~</span>';
+    case 'B': return '<span class="ball head both"></span>';
+    case 'F': return '<span class="ball head right flam"></span>';
+    default: return '';
+  }
+}
+// The letter under a cell is derived from the stroke, so it can never disagree with it
+function handLabel(c) {
+  if (c === 'R' || c === 'r') return ['R', 'r'];
+  if (c === 'L' || c === 'l') return ['L', 'l'];
+  if (c === '~') return ['~', 'x'];
+  if (c === 'B' || c === 'F') return [c, ''];
+  return ['·', ''];
+}
+
+function renderPalette() {
+  els.palette.innerHTML = PALETTE.map(([key, label]) => {
+    const sw = key === 'cycle' ? '↻' : key === 'erase' ? '✕' : glyph(key);
+    return `<button type="button" class="pal" data-brush="${key}" aria-pressed="${brush === key}"><span class="sw">${sw}</span>${label}</button>`;
+  }).join('');
+}
+
+function renderGrid() {
+  const g = active();
+  const n = g.bars.length;
+  els.bars.innerHTML = g.bars.map((bar, b) => {
+    const steps = bar.cells.map((c, s) => {
+      const cls = ['step', s % 4 === 0 ? 'beat' : '', s === 4 || s === 12 ? 'sep' : '', s === 8 ? 'sep-wide' : ''].join(' ');
+      const [txt, hcls] = handLabel(c);
+      return `<div class="${cls}">
+        <span class="sub mono">${SUBDIV[s]}</span>
+        <button type="button" class="cell" data-bar="${b}" data-step="${s}" aria-label="Bar ${b + 1}, ${SUBDIV[s]} (step ${s + 1}): ${CELL_NAME[c]}">${glyph(c)}</button>
+        <button type="button" class="hand mono ${hcls}" data-bar="${b}" data-step="${s}" aria-label="Swap hand, bar ${b + 1} step ${s + 1}" ${hcls === 'r' || hcls === 'l' ? '' : 'tabindex="-1"'}>${txt}</button>
+      </div>`;
+    }).join('');
+    return `<div class="bar" data-bar="${b}">
+      <div class="bar-head">
+        <span class="bar-num">Bar ${b + 1}</span>
+        <div class="bar-actions">
+          <button type="button" class="btn arrow" data-act="up" data-bar="${b}" aria-label="Move bar ${b + 1} up" ${b === 0 ? 'disabled' : ''}>↑</button>
+          <button type="button" class="btn arrow" data-act="down" data-bar="${b}" aria-label="Move bar ${b + 1} down" ${b === n - 1 ? 'disabled' : ''}>↓</button>
+          <button type="button" class="btn" data-act="dup" data-bar="${b}">Duplicate</button>
+          <button type="button" class="btn danger" data-act="del" data-bar="${b}" ${n === 1 ? 'disabled' : ''}>Delete</button>
+        </div>
+      </div>
+      <input class="bar-note" type="text" data-bar="${b}" maxlength="${MAX_NOTE}" placeholder="Add a note for this bar…" value="${escapeHtml(bar.note || '')}" aria-label="Note for bar ${b + 1}">
+      <div class="steps">${steps}</div>
+    </div>`;
+  }).join('');
+  lastCell = null; lastBar = -1;
+}
+
+function optionFor(g) {
+  const o = document.createElement('option');
+  o.value = g.id;
+  o.textContent = `${g.title} · ${g.bars.length} bar${g.bars.length === 1 ? '' : 's'}`;
+  return o;
+}
+function renderLibrary() {
+  els.grooveSelect.innerHTML = '';
+  if (mode === 'shared') {
+    const std = document.createElement('optgroup');
+    std.label = 'Standard grooves';
+    library.filter((g) => g.readonly).forEach((g) => std.appendChild(optionFor(g)));
+    els.grooveSelect.appendChild(std);
+    if (own().length) {
+      const grp = document.createElement('optgroup');
+      grp.label = 'My grooves';
+      own().forEach((g) => grp.appendChild(optionFor(g)));
+      els.grooveSelect.appendChild(grp);
+    }
+  } else {
+    library.forEach((g) => els.grooveSelect.appendChild(optionFor(g)));
+  }
+  els.grooveSelect.value = active().id;
+  els.delGrooveBtn.disabled = active().readonly || library.length <= 1;
+  const g = active();
+  els.grooveHint.classList.toggle('hidden', !g.readonly);
+  els.grooveHint.textContent = g.readonly ? 'Standard groove. Any change you make saves your own copy under My grooves.' : '';
+  if (mode === 'shared') {
+    els.restoreBtn.textContent = 'Delete all my grooves';
+    els.restoreBtn.disabled = own().length === 0;
+  } else {
+    els.restoreBtn.textContent = 'Delete all grooves';
+  }
+}
+
+function renderHeader() {
+  const g = active();
+  const bars = `${g.bars.length} bar${g.bars.length === 1 ? '' : 's'}`;
+  els.nowTitle.textContent = g.title || 'Untitled groove';
+  els.nowMeta.textContent = mode === 'shared' ? `${g.readonly ? 'Standard' : 'My groove'} · ${bars}` : bars;
+  els.sheetTitle.textContent = g.title || 'Untitled groove';
+  els.sheetMeta.textContent = `${g.bars.length} of ${MAX_BARS} bars`;
+  if (document.activeElement !== els.titleInput) els.titleInput.value = g.title;
+  if (document.activeElement !== els.bpmInput) els.bpmInput.value = settings.bpm;
+  els.bpmSlider.value = settings.bpm;
+}
+
+function syncTransport() {
+  els.playBtn.classList.toggle('on', isPlaying);
+  els.playIcon.classList.toggle('hidden', isPlaying);
+  els.stopIcon.classList.toggle('hidden', !isPlaying);
+  els.playLabel.textContent = isPlaying ? 'Stop' : 'Play';
+  els.playBtn.setAttribute('aria-label', isPlaying ? 'Stop' : 'Play');
+  els.pulseBtn.setAttribute('aria-pressed', String(settings.pulse));
+  els.countInBtn.setAttribute('aria-pressed', String(settings.countIn));
+  els.followBtn.setAttribute('aria-pressed', String(settings.follow));
+  els.swingSlider.value = settings.swing;
+  els.swingVal.textContent = `${settings.swing}%`;
+}
+
+function renderText(force = false) {
+  if (textDirty && !force) return;
+  els.textArea.value = textScope === 'one' ? grooveToText(active()) : library.map(grooveToText).join('\n\n');
+  textDirty = false;
+  showErrors([]);
+}
+
+function renderAll() {
+  renderHeader();
+  renderLibrary();
+  renderGrid();
+  renderText();
+  syncTransport();
+}
+
+let toastTimer = null;
+function toast(msg) {
+  els.toast.textContent = msg;
+  els.toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => els.toast.classList.remove('show'), 2600);
+}
+function showErrors(list) {
+  els.textErrors.innerHTML = '';
+  list.slice(0, 8).forEach((e) => { const li = document.createElement('li'); li.textContent = e; els.textErrors.appendChild(li); });
+  els.textErrors.classList.toggle('hidden', list.length === 0);
+}
+
+function armed(btn, label, onConfirm) {
+  if (btn.dataset.armed) {
+    clearTimeout(Number(btn.dataset.armed));
+    delete btn.dataset.armed;
+    btn.classList.remove('armed');
+    btn.textContent = btn.dataset.label;
+    onConfirm();
+    return;
+  }
+  btn.dataset.label = btn.textContent;
+  btn.textContent = label;
+  btn.classList.add('armed');
+  btn.dataset.armed = String(setTimeout(() => {
+    delete btn.dataset.armed;
+    btn.classList.remove('armed');
+    btn.textContent = btn.dataset.label;
+  }, 3000));
+}
+
+// ======================================================================
+// Events
+// ======================================================================
+els.playBtn.addEventListener('click', togglePlay);
+
+function setBpm(v) {
+  const bpm = clampBpm(v, settings.bpm);
+  if (bpm !== settings.bpm) { settings.bpm = bpm; touch(); }
+  renderHeader();
+}
+els.bpmSlider.addEventListener('input', (e) => setBpm(e.target.value));
+els.bpmInput.addEventListener('change', (e) => setBpm(e.target.value));
+
+let taps = [];
+els.tapBtn.addEventListener('click', () => {
+  const now = performance.now();
+  if (taps.length && now - taps[taps.length - 1] > 2000) taps = [];
+  taps.push(now);
+  if (taps.length > 6) taps.shift();
+  if (taps.length >= 2) {
+    setBpm(60000 / ((taps[taps.length - 1] - taps[0]) / (taps.length - 1)));
+    toast(`Tempo: ${settings.bpm} bpm`);
+  }
+});
+
+function setSetting(key, value) { settings[key] = value; syncTransport(); touch(); }
+els.swingSlider.addEventListener('input', (e) => setSetting('swing', Number(e.target.value)));
+els.pulseBtn.addEventListener('click', () => setSetting('pulse', !settings.pulse));
+els.countInBtn.addEventListener('click', () => setSetting('countIn', !settings.countIn));
+els.followBtn.addEventListener('click', () => setSetting('follow', !settings.follow));
+
+els.grooveSelect.addEventListener('change', (e) => {
+  if (isPlaying) stopPlayback();
+  settings.activeId = e.target.value;
+  textDirty = false;
+  touch();
+  renderAll();
+});
+
+let titleUndoPushed = false;
+els.titleInput.addEventListener('focus', () => { titleUndoPushed = false; });
+els.titleInput.addEventListener('input', (e) => {
+  if (!titleUndoPushed) { pushUndo(); titleUndoPushed = true; }
+  const wasReadonly = active().readonly;
+  ensureEditable().title = e.target.value;
+  touch();
+  renderHeader();
+  if (wasReadonly) renderLibrary();
+});
+els.titleInput.addEventListener('blur', () => {
+  const g = active();
+  if (!g.readonly && !g.title.trim()) { g.title = 'Untitled groove'; touch(); }
+  renderAll();
+});
+
+function addGroove(title, bars) {
+  const g = { id: uniqueId(slug(title)), title, bars };
+  const idx = library.indexOf(active());
+  if (active().readonly) library.push(g); else library.splice(idx + 1, 0, g);
+  settings.activeId = g.id;
+}
+els.newBtn.addEventListener('click', () => {
+  if (isPlaying) stopPlayback();
+  pushUndo();
+  addGroove('New groove', [emptyBar()]);
+  textDirty = false; touch(); renderAll();
+  els.titleInput.focus(); els.titleInput.select();
+});
+els.dupGrooveBtn.addEventListener('click', () => {
+  if (isPlaying) stopPlayback();
+  const g = active();
+  pushUndo();
+  addGroove(`${g.title} (copy)`, structuredClone(g.bars));
+  textDirty = false; touch(); renderAll();
+  toast(`Duplicated “${g.title}”`);
+});
+els.delGrooveBtn.addEventListener('click', () => {
+  if (active().readonly || library.length <= 1) return;
+  armed(els.delGrooveBtn, 'Tap again to delete', () => {
+    if (isPlaying) stopPlayback();
+    const g = active();
+    pushUndo();
+    const idx = library.indexOf(g);
+    library.splice(idx, 1);
+    settings.activeId = library[Math.max(0, idx - 1)].id;
+    textDirty = false; touch(); renderAll();
+    toast(`Deleted “${g.title}” (Undo to bring it back)`);
+  });
+});
+els.undoBtn.addEventListener('click', undo);
+
+els.addBarBtn.addEventListener('click', () => {
+  if (active().bars.length >= MAX_BARS) { toast(`Maximum ${MAX_BARS} bars`); return; }
+  mutate((g) => g.bars.push(emptyBar()));
+});
+els.clearBtn.addEventListener('click', () => {
+  armed(els.clearBtn, 'Tap again to clear', () => {
+    mutate((g) => g.bars.forEach((b) => b.cells.fill('')));
+    toast('Cleared notes (Undo to restore)');
+  });
+});
+
+els.palette.addEventListener('click', (e) => {
+  const t = e.target.closest('.pal');
+  if (!t) return;
+  brush = t.dataset.brush;
+  renderPalette();
+});
+
+function preview(c) {
+  if (isPlaying || !c) return;
+  initAudio();
+  playCell(c, audioCtx.currentTime + 0.04, stepDur());
+}
+function refocus(selector) {
+  const el = els.bars.querySelector(selector);
+  if (el) el.focus({ preventScroll: true });
+}
+function setCell(b, s, next) {
+  let bar = null;
+  mutate((g) => { bar = g.bars[b]; bar.cells[s] = next; });
+  preview(next);
+  refocus(`.cell[data-bar="${b}"][data-step="${s}"]`);
+}
+
+els.bars.addEventListener('click', (e) => {
+  const t = e.target.closest('button');
+  if (!t || t.disabled) return;
+  const b = Number(t.dataset.bar), s = Number(t.dataset.step);
+  if (t.classList.contains('cell')) {
+    const cur = active().bars[b].cells[s];
+    let next;
+    if (brush === 'cycle') next = CELL_CYCLE[(CELL_CYCLE.indexOf(cur) + 1) % CELL_CYCLE.length];
+    else if (brush === 'erase') next = '';
+    else next = cur === brush ? '' : brush;          // tapping the same stroke again clears it
+    if (next === cur) return;
+    setCell(b, s, next);
+  } else if (t.classList.contains('hand')) {
+    const cur = active().bars[b].cells[s];
+    const swap = { R: 'L', L: 'R', r: 'l', l: 'r' }[cur];
+    if (!swap) return;                                // only R/L strokes have a hand to swap
+    mutate((g) => { g.bars[b].cells[s] = swap; });
+    preview(swap);
+    refocus(`.hand[data-bar="${b}"][data-step="${s}"]`);
+  } else if (t.dataset.act === 'up' || t.dataset.act === 'down') {
+    const to = t.dataset.act === 'up' ? b - 1 : b + 1;
+    mutate((g) => { [g.bars[b], g.bars[to]] = [g.bars[to], g.bars[b]]; });
+    refocus(`[data-act="${t.dataset.act}"][data-bar="${to}"]`);
+  } else if (t.dataset.act === 'dup') {
+    if (active().bars.length >= MAX_BARS) { toast(`Maximum ${MAX_BARS} bars`); return; }
+    mutate((g) => g.bars.splice(b + 1, 0, structuredClone(g.bars[b])));
+    toast(`Duplicated bar ${b + 1}`);
+  } else if (t.dataset.act === 'del') {
+    mutate((g) => g.bars.splice(b, 1));
+    toast(`Deleted bar ${b + 1} (Undo to restore)`);
+  }
+});
+// Right-click a box = cycle backwards (desktop shortcut)
+els.bars.addEventListener('contextmenu', (e) => {
+  const cell = e.target.closest('.cell');
+  if (!cell) return;
+  e.preventDefault();
+  const b = Number(cell.dataset.bar), s = Number(cell.dataset.step);
+  const cur = active().bars[b].cells[s];
+  setCell(b, s, CELL_CYCLE[(CELL_CYCLE.indexOf(cur) - 1 + CELL_CYCLE.length) % CELL_CYCLE.length]);
+});
+
+// Bar notes: saved as you type, without re-rendering the grid (which would steal focus)
+let noteUndoPushed = false;
+els.bars.addEventListener('focusin', (e) => { if (e.target.classList.contains('bar-note')) noteUndoPushed = false; });
+els.bars.addEventListener('input', (e) => {
+  const inp = e.target;
+  if (!inp.classList.contains('bar-note')) return;
+  if (!noteUndoPushed) { pushUndo(); noteUndoPushed = true; }
+  const wasReadonly = active().readonly;
+  ensureEditable().bars[Number(inp.dataset.bar)].note = inp.value.replace(/\s+/g, ' ').slice(0, MAX_NOTE);
+  touch();
+  renderHeader();
+  if (wasReadonly) renderLibrary();
+  renderText();
+});
+els.bars.addEventListener('focusout', (e) => {
+  const inp = e.target;
+  if (!inp.classList.contains('bar-note')) return;
+  const bar = active().bars[Number(inp.dataset.bar)];
+  if (bar && bar.note !== cleanNote(bar.note)) { bar.note = cleanNote(bar.note); touch(); renderText(); }
+});
+els.bars.addEventListener('keydown', (e) => {
+  if (e.target.classList.contains('bar-note') && e.key === 'Enter') e.target.blur();
+});
+
+// Text panel
+function setScope(scope) {
+  textScope = scope;
+  els.scopeOneBtn.setAttribute('aria-pressed', String(scope === 'one'));
+  els.scopeAllBtn.setAttribute('aria-pressed', String(scope === 'all'));
+  renderText(true);
+}
+els.scopeOneBtn.addEventListener('click', () => setScope('one'));
+els.scopeAllBtn.addEventListener('click', () => setScope('all'));
+els.refreshTextBtn.addEventListener('click', () => renderText(true));
+els.textArea.addEventListener('input', () => { textDirty = true; });
+
+els.applyTextBtn.addEventListener('click', () => {
+  const { grooves, errors } = parseNotation(els.textArea.value);
+  if (errors.length) { showErrors(errors); toast('Fix the listed lines first'); return; }
+  if (!grooves.length) { showErrors(['No grooves found']); return; }
+  if (isPlaying) stopPlayback();
+  if (textScope === 'one') {
+    if (grooves.length > 1) { showErrors([`This text has ${grooves.length} grooves. Switch to “All grooves” to apply several at once.`]); return; }
+    const src = grooves[0];
+    const cur = active();
+    if (sameBars(cur.bars, src.bars) && cur.title === src.title) { toast('No changes'); return; }
+    mutate((g) => {
+      const clashesStd = library.some((x) => x.readonly && x.title.toLowerCase() === src.title.toLowerCase());
+      if (!clashesStd) g.title = src.title;
+      g.bars = src.bars;
+    }, { render: false });
+    textDirty = false; renderAll();
+    toast(`Updated “${active().title}”`);
+  } else {
+    pushUndo();
+    const { added, updated, lastId } = mergeGrooves(grooves);
+    if (lastId && (added || updated)) settings.activeId = lastId;
+    textDirty = false; touch(); renderAll();
+    toast(added || updated ? `Updated ${updated}, added ${added}` : 'No changes');
+  }
+});
+
+async function copyText(str) {
+  try { await navigator.clipboard.writeText(str); return true; }
+  catch {
+    els.textArea.focus(); els.textArea.select();
+    try { return document.execCommand('copy'); } catch { return false; }
+  }
+}
+els.copyTextBtn.addEventListener('click', async () => {
+  const ok = await copyText(els.textArea.value);
+  toast(ok ? 'Copied' : 'Text selected, use your device’s Copy');
+});
+if (navigator.share) {
+  els.shareTextBtn.classList.remove('hidden');
+  els.shareTextBtn.addEventListener('click', async () => {
+    try { await navigator.share({ title: 'Maracatu alfaia grooves', text: els.textArea.value }); }
+    catch (e) { if (e && e.name !== 'AbortError') toast('Sharing isn’t available here, use Copy'); }
+  });
+}
+
+els.exportBtn.addEventListener('click', async () => {
+  const json = JSON.stringify(snapshot(), null, 2);
+  const filename = `maracatu-alfaia-${mode === 'shared' ? 'my-grooves-' : ''}${new Date().toISOString().slice(0, 10)}.json`;
+  if (window.claude && typeof window.claude.use === 'function') {
+    try {
+      const dl = await window.claude.use('downloads');
+      if (dl) { await dl.save({ filename, data: new Blob([json], { type: 'application/json' }) }); toast('Exported'); return; }
+    } catch (e) {
+      if (e && e.code === 'declined') { toast('Export cancelled'); return; }
+    }
+  }
+  const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+  const a = Object.assign(document.createElement('a'), { href: url, download: filename });
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast('Exported');
+});
+
+els.importInput.addEventListener('change', (e) => {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const grooves = groovesFromFileText(String(reader.result));
+      if (isPlaying) stopPlayback();
+      pushUndo();
+      const { added, updated, lastId } = mergeGrooves(grooves);
+      if (lastId) settings.activeId = lastId;
+      textDirty = false; touch(); renderAll();
+      toast(added || updated ? `Imported: updated ${updated}, added ${added}` : 'Nothing new to import');
+    } catch (err) {
+      toast(`Couldn’t import: ${err.message}`);
+    }
+    els.importInput.value = '';
+  };
+  reader.readAsText(file);
+});
+
+els.restoreBtn.addEventListener('click', () => {
+  const label = mode === 'shared' ? 'Tap again: deletes all your grooves' : 'Tap again: deletes every groove';
+  armed(els.restoreBtn, label, () => {
+    if (isPlaying) stopPlayback();
+    pushUndo();
+    if (mode === 'shared') {
+      library = library.filter((g) => g.readonly);
+      if (!active().readonly) settings.activeId = library[0].id;
+      toast('Deleted your grooves (Undo to bring them back)');
+    } else {
+      library = starterLibrary();
+      settings.activeId = library[0].id;
+      toast('All grooves deleted (Undo to bring them back)');
+    }
+    textDirty = false; touch(); renderAll();
+  });
+});
+
+window.addEventListener('keydown', (e) => {
+  const typing = ['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement?.tagName);
+  if (e.code === 'Space' && !typing) {
+    e.preventDefault(); togglePlay();
+  } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z' && !typing) {
+    e.preventDefault(); undo();
+  }
+});
+
+// ======================================================================
+// Init: Claude viewer → editor with account sync; otherwise try grooves.txt
+// ======================================================================
+async function init() {
+  renderPalette();
+  const inClaude = Boolean(window.claude && typeof window.claude.use === 'function');
+  const standard = inClaude ? null : await loadSharedFile();
+  if (standard) {
+    mode = 'shared';
+    if (!applyStored(loadLocal(), standard)) {
+      library = standard;
+      settings.activeId = standard[0].id;
+    }
+    els.modeNote.classList.remove('hidden');
+    els.modeNote.textContent = 'My grooves are saved only in this browser, and can be lost if browser data is cleared. To keep a groove or send it on, use Copy text or Export file.';
+    if (skippedShared.length) {
+      const warn = document.createElement('p');
+      warn.className = 'note warn';
+      warn.textContent = `Skipped from grooves.txt because of errors: ${skippedShared.map((s) => `${s.title} (${s.error})`).join('; ')}`;
+      els.modeNote.after(warn);
+    }
+    setSync('Standard grooves loaded from grooves.txt');
+  } else {
+    mode = 'editor';
+    if (!applyStored(loadLocal())) {
+      library = starterLibrary();
+      settings.activeId = library[0].id;
+    }
+    setSync('Saved on this device');
+  }
+  renderAll();
+  if (inClaude) initCloud();
+}
+init();
+</script>
+</body>
+</html>

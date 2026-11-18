@@ -1,0 +1,10 @@
+// Maracatu alfaia grooves: the shared library for the practice page.
+// One line per bar, 16 sixteenths, one character each. Spaces are ignored.
+//   R L  full stroke, right or left hand
+//   r l  ghost note, right or left hand
+//   ~    rumble     B  both hands     F  flam     .  rest
+// End a line with x2, x3... to repeat the bar, and with > text to add a note to it.
+// A line starting with # starts a new groove. Lines starting with // are comments.
+// A groove with an error is skipped and named in a warning on the page.
+// While this file has no grooves, the page behaves as a full editor.
+
