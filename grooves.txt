@@ -79,6 +79,15 @@ R..R .R.. R..R .RLR
 R..R LR.R LR.R L.R.  > Parada
 L... BRRR ...R L...  > Resolution and we flow into afoxé (we DO NOT loop)
 
+# Tumaraca (with Naná) - Crossed arms
+.... .... .... ....  > Newton: "Tumaraca!" (for the 3rd time). Us: "Tumaraca TU!"
+R..R LR.R LR.R L.R.  > Parada
+L... .... ..R. L.R.  > Us: "HEY!"
+L... .RlR R... R...  > Us: "Uoo!" (in the space before the paradiddle)
+R... RLRL .... RLRL  > If regular tumaraca, we stop at the 1. If crossed arms sign, we continue to Naná. Note the app does not emulate the triplets well, go to rehearsal!
+.... RLRL RLRL RL..  > If Newton signs 1 during this, we flow into Luanda (next bar), otherwise stop here.
+R... .... lR.. lR..
+
 # Nagô (Porto Rico)
 R..R LR.R LR.R L.R.  > Newton: "Nossa rainha já se coorou" (Note: this is a loop, we don't start here)
 L... .... .... ....  > Us: "Nagô nagô nagô"
