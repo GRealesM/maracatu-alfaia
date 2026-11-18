@@ -97,3 +97,19 @@ R... lR.. lR.. lR..  > Newton: "Nossa rainha já se coroou"
 R... lR.. lR.. lR..  > Us: "Nagô nagô"
 R... lR.. lR.. lR..  > Us: "Nossa rainha já se coroou"
 R... lR.. lR.. lR..  > Newton: "Nagô nagô nagô"
+
+# Viration Biancó
+lR.r l... LR.r l...
+lR.r l..R L..R L..R
+L... ..rr LR.r LR.r
+LR.r L.rr LR.r L.R.
+R... .... lR.. lR..  > Back to Luanda
+
+# Viration Ian
+R... .R.r L... .R.r
+L... .R.r LR.r LR.r
+L..R L... .R.r LR.r
+L..R L... .R.r L.R.
+R... .... lR.. lR..  > Back to Luanda
+
+
