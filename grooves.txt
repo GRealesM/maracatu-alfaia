@@ -8,3 +8,83 @@
 // A groove with an error is skipped and named in a warning on the page.
 // While this file has no grooves, the page behaves as a full editor.
 
+# Luanda - 1
+R... .... lR.. lR..
+
+# Malé - 2
+R..l .R.. lR.. lR..
+
+# Arrasto - 3
+R... lR.. lR.. lR..
+
+# Martelo - 4
+lR.r l.R. lR.r l...
+
+# Afoxé - Waves
+R..R l... .R.R l...
+
+# Transition (normal) - Hand wave
+..R. L.R. LR.r L.R.
+
+# Transition (Luanda) - Only selected songs
+..R. L.R. lR.. lR..
+
+# Transition (Martelo) - One day...
+..R. L.R. lR.r l...
+
+# Parada - No sign
+R..R LR.R LR.R L.R.
+L... .... .... ....
+
+# Baque de Luanda - Baque + 1
+R... .... ..R. L.R.
+L... .... .... ....
+R..R L..R lR.R L.RL
+R... .... .... ....
+
+# Baque Sandrinho - Baque + S
+.... .... .... ....  x3  > Here we just wait for the caixas to do their thing
+.... .... .... ....  x5  > End of first round of caixas showing off
+R... ..R. .... R.L.  x2
+R... .... .... ....
+~~~~ ~~~~ .... ....  > After finishing the rumble, the caixas do "tatá!" and we continue to Malé
+
+# Baque de parada - Baque + 3
+R..R lR.R lR.R L.R.  > One parada
+L... .... .... ....  > Here we do a 360 turn to the left during silence
+R..R lR.R lR.R L.R.  > Second parada
+L... .... .... ....  > Now to the right...
+R..R lR.R lR.R L.R.  > Third parada
+L.R. L.R. .R.r L.R.  > and we flow to transition
+R... lR.. lR.. lR..  x3  > Three arrastos and back to the start
+
+# Baque Martelo (intro) - Baque + 4 + "go back"
+R... .... .... .RLR
+R... .... .... .R..
+R... .... .... ....  > We loop here until Newton whistles with the same pattern below, then we move to bar 4
+R.R. R.R. .R.R l...  > And after this, we go straight to martelo
+
+# Baque de Afoxé - Baque + Waves
+R..R l... .R.R l...  > Afoxe
+R..R l... .R.R lR.R  > Afoxe with a twist into the next bar
+l..R l... .R.R l...  > another afoxe after the twist
+R.R. R.R. R... ....  > At the end we yell "HEY!" and start again
+
+# Baque Aú - Baque + punch upwards
+R.R. R.R. .R.R .RLR  > 4 hits + 2 hits + pradiddle
+R..R L..R L..R L...
+R.R. R.R. .R.R .RLR  > Again 4 + 2 + pradiddle
+R..R .R.. R..R .RLR
+..R. L.R. lR.. lR..  > Luanda transition
+R..R LR.R LR.R L.R.  > Parada
+L... BRRR ...R L...  > Resolution and we flow into afoxé (we DO NOT loop)
+
+# Nagô (Porto Rico)
+R..R LR.R LR.R L.R.  > Newton: "Nossa rainha já se coorou" (Note: this is a loop, we don't start here)
+L... .... .... ....  > Us: "Nagô nagô nagô"
+R..R LR.R LR.R L.R.  > Us: "Nossa rainha já se..."
+L.R. L.R. .R.r L.R.  > coroou" Newton: "Nagô nagô"
+R... lR.. lR.. lR..  > Newton: "Nossa rainha já se coroou"
+R... lR.. lR.. lR..  > Us: "Nagô nagô"
+R... lR.. lR.. lR..  > Us: "Nossa rainha já se coroou"
+R... lR.. lR.. lR..  > Newton: "Nagô nagô nagô"
