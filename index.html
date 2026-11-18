@@ -680,9 +680,8 @@ function noiseBurst(time, filterType, freq, peak, decay) {
 
 // One mallet stroke. level: ~0.3 ghost … 1 full. The left hand is pitched slightly higher and drier.
 function drumHit(time, level, hand) {
-  const left = hand === 'L';
-  const f0 = left ? 88 : 78;                    // fundamental, Hz
-  const decay = 0.14 + 0.5 * level * (left ? 0.85 : 1);
+  const f0 = 80;                                // fundamental, Hz (same for both hands)
+  const decay = 0.14 + 0.5 * level;
 
   // Body: pitched membrane with a fast initial pitch drop
   const body = audioCtx.createOscillator();
