@@ -128,6 +128,18 @@ R... R... R... R...  > Alfaia + caixa alternate with the timbal
 R..R L.RR lR.R L.R.  > Final P2
 R... .... R... ....  > PUM - CLA! - PUM! (Chega meu povoo)
 
+# Viration 1 (Luanda)
+L..R L..R lR.R lR.R
+
+# Viration 2 (Arrasto)
+L..R lR.R lR.R lR.R  > Good to play during arrasto!
+
+# Viration 3
+LR.R L..R lR.R lR.R  > Note: Do not play when playing Malé
+
+# Viration 4
+L... ..RR lR.R lR.R
+
 # Viration Biancó
 lR.r l... LR.r l...
 lR.r l..R L..R L..R
