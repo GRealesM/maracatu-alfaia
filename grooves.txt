@@ -98,6 +98,33 @@ R... lR.. lR.. lR..  > Us: "Nagô nagô"
 R... lR.. lR.. lR..  > Us: "Nossa rainha já se coroou"
 R... lR.. lR.. lR..  > Newton: "Nagô nagô nagô"
 
+# Darrum II (Porto Rico)
+.... .... R..R L.R.  > Parada 1 Porto Rico
+LR.R L.R. L... ..R.
+R.R. R... R... ....  > Those 4 + 1 hits
+R..R L... .R.R L...  > Afoxe
+~~~~ ~~~~ ~~~~ ~~~~  > Rumble
+R... .... ..R. L.R.  > Baque 1 with special Porto Rico parada (or Parada 2)
+L... .... .... ....
+R..R L.RR lR.R L.R.  > Note doubled R in beat 2
+R... .... .... ....  > Ooooooooh!
+R.R. R... .... ....  > We enter the 3/1 combination, where after the third 3-hit we go straight into P2 extended
+R... .... .... ....
+R.R. R... .... ....
+R... .... .... ....
+R.R. R... .... ....
+R..R L.RR lR.R LR.R  > Parada 2 extended with transition
+L.R. L.R. LR.r L...
+R... .... .... .R.R  > 3 quick RRL, twice
+L... .... .... .R.R
+L..R L.RR lR.R LR.R  > After the second, we go straight into P2 extended with transition again
+L.R. L.R. LR.r L...
+R... .... .... ....  > Newton: Tumaraca!, Us: Tumaraca-tu!
+R..R L.RR lR.R L.R.  > P2
+R... R... R... R...  > Alfaia + caixa alternate with the timbal
+R..R L.RR lR.R L.R.  > Final P2
+R... .... R... ....  > PUM - CLA! - PUM! (Chega meu povoo)
+
 # Viration Biancó
 lR.r l... LR.r l...
 lR.r l..R L..R L..R
