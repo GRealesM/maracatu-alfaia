@@ -12,7 +12,7 @@
 R... .... lR.. lR..
 
 # Malé - 2
-R..l .R.. lR.. lR..
+R... l.R. lR.. lR..
 
 # Arrasto - 3
 R... lR.. lR.. lR..
