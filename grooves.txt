@@ -24,7 +24,7 @@ lR.r l.R. lR.r l...
 R..R l... .R.R l...
 
 # Leão Coroado
-R... ..R. LR.L LR..
+R... ..R. LR.L LR.L
 
 # Transition (normal) - Hand wave
 ..R. L.R. LR.r L.R.
